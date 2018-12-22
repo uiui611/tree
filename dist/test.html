@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test HTML</title>
+
+    <script type="module">
+        import * as tree from './tree.mjs';
+        tree.walk(
+            {name: 'hoge' },
+            o=>console.log(o.name)
+        );
+    </script>
+</head>
+<body>
+    Check your console!!
+</body>
+</html>
