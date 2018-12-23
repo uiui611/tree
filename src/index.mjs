@@ -4,3 +4,4 @@
  */
 
 export * from "./traversal";
+export * from "./tree";
