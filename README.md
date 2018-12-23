@@ -13,7 +13,7 @@ In a browser:
 (Required ES Modules support and 'tree.mjs' should be on the same directory.)
 
 ## Features
-Tree traversal.
+Available to traverse tree.
 ```javascript
 import {walk} from 'tree';
 const root = {
@@ -39,6 +39,13 @@ walk(root, o=>console.log(o.name));
     // => child C
 ```
 (The callback is called on the all **leaf** node.)
+
+Traverse as an iterator:
+```javascript
+import {Tree} from 'tree';
+/* ... */
+for(let node of new Tree(root)) console.log(node.name);
+```
 
 Breath-First mode:
 ```javascript

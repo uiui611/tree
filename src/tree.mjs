@@ -11,7 +11,7 @@ import {traversalState} from "./traversal";
  * @class
  * @param {object} root The root node for tree object.
  * @param {object} [option={}] The option object.
- * @param {function} [getChildren=o=>o.children] The function to get node's children.
+ * @param {function} [option.getChildren=o=>o.children] The function to get node's children.
  *
  *   This function returns an array of children or a falsy value (if it is a leaf node).
  */
