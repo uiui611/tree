@@ -4,4 +4,6 @@
  */
 
 export * from "./traversal";
-export * from "./tree";
+
+import Tree from './tree';
+export default Tree;

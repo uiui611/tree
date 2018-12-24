@@ -15,7 +15,7 @@ import {traversalState} from "./traversal";
  *
  *   This function returns an array of children or a falsy value (if it is a leaf node).
  */
-export class Tree{
+export default class Tree{
     constructor(root, { getChildren=o=>o.children }={}){
         this.node = root;
         Object.assign(this, {getChildren});
