@@ -1,4 +1,4 @@
-import {Tree} from './tree.mjs';
+import Tree from './tree.mjs';
 import assert from 'assert';
 
 describe('Check Tree Container', ()=>{
