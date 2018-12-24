@@ -23,7 +23,7 @@ class Tree{
 
     /**
      * Walk throw the current node.
-     * @param options
+     * @param options The option object to be the second argument of {@link walk walk(root, option)}
      * @see walk
      */
     walk(options){ return walk(this.node, options); }
