@@ -120,4 +120,42 @@ describe('Check Tree Container', ()=>{
             )
         });
     });
+    describe('Tree#reduce feature.', ()=>{
+        it('Not convert a single node.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({ name: 'root' }).reduce((p,c)=>'hoge'),
+                { name: 'root' }
+            );
+        });
+        it('Convert a single node when the initial provided.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({ name: 'root'}).reduce((p,c)=>p+c.name, 'fuga'),
+                'fugaroot'
+            );
+        });
+        it('Reduce with children with initial value.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    value: 100,
+                    children:[
+                        {value: 1 },
+                        {value: 10}
+                    ]
+                }).reduce((arr,c)=>[c.value, ...arr].reduce((v0,v1)=>v0+v1), [0]),
+                111
+            );
+        });
+        it('Reduce with children without initial value.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    value: 100,
+                    children:[
+                        {value: 1 },
+                        {value: 10}
+                    ]
+                }).reduce((arr,c)=>[c, ...arr].reduce((o0, o1)=>({value:o0.value+o1.value }))),
+                {value:111}
+            );
+        });
+    });
 });

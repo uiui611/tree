@@ -195,6 +195,7 @@ export class BreathFirstWalker extends ObjectTreeWalker{
  * @param {object} node The current node.
  * @param {object} option The optional information container.
  * @param {Array.<object>} option.parents The array for the current node from the root.
+ * @param {boolean} option.isOnLeaf True if and only if the walker is on a leaf node.
  */
 
 /**
@@ -228,7 +229,8 @@ export function walk(root, option){
         const args = [
             val,
             {
-                parents: walker.getParents()
+                parents: walker.getParents(),
+                isOnLeaf: walker.state===traversalState.LEAF
             }
         ];
         switch (walker.state) {

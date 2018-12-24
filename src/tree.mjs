@@ -48,29 +48,55 @@ class Tree{
      * @returns {Tree} The generated tree.
      */
     map(mappingFunction, options){
-        const stack = [{node: null, children:[]}];
         const {newSetChildren, newGetChildren}=tree_getOptions.call(this, options);
-        this.walk({
-            getChildren: this.getChildren,
-            preVisit(node){
-                stack.push({node, children:[]});
+        const root = this.reduce(
+            (children, node, {isOnLeaf})=>{
+                const newNode = mappingFunction(node);
+                if(!isOnLeaf) newSetChildren(newNode, children);
+                return newNode;
             },
-            visit(node){
-                stack[stack.length-1].children.push(
-                    mappingFunction(node)
+            null
+        );
+        return new Tree(root, {getChildren: newGetChildren, setChildren: newSetChildren });
+    }
+
+    /**
+     * Compute a single object from a node and an object from it's children.
+     * @callback Tree~reducer
+     * @param {Array} accumulators The accumulators computed from it children.
+     * @param {*} currentValue The current node value.
+     * @param {object} options The tree-traversal option equals to
+     *   {@link visitor visitor(node, option)} applied at the second argument.
+     */
+    /**
+     * Compute a single value from this tree.
+     *
+     * The reducer apply children array, and the current node.
+     * If you set the initial value, then the reducer is called on the laef node too,
+     *   but you have not, then it is called on the non-leaf node only.
+     * @param {Tree~reducer} reducer The reducer to combine node and it's children.
+     * @param {*} [initial] The initial value to provide leaf node's children.
+     * @returns {*} The result.
+     */
+    reduce(reducer, initial){
+        const stack = [[]];
+        const hasInitial = initial !== undefined;
+        this.walk({
+            visit(node, option){
+                stack[stack.length-1].push(
+                    hasInitial ? reducer(initial, node, option)
+                               : node
                 );
             },
-            postVisit(node){
+            preVisit(){
+                stack.push([]);
+            },
+            postVisit(node, option){
                 const top = stack.pop();
-                const mapped = mappingFunction(node);
-                newSetChildren(mapped, top.children);
-                stack[stack.length-1].children.push(mapped);
+                stack[stack.length-1].push(reducer(top, node, option));
             }
         });
-        return new Tree(
-            stack[0].children[0],
-            { getChildren: newGetChildren, setChildren: newSetChildren }
-        );
+        return stack[0][0];
     }
 
     /**
