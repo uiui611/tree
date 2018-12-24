@@ -36,4 +36,88 @@ describe('Check Tree Container', ()=>{
             assert.deepStrictEqual(foundsList[2], foundsList[0]);
         });
     });
+    describe('Tree#map feature.', ()=>{
+        it('Map single node.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    name: 'root',
+                }).map(node=>({value:node.name})).node,
+                { value: 'root' }
+            );
+        });
+        it('Map node with children.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    name: 'root',
+                    children:[
+                        { name: 'child A' },
+                        { name: 'child B' }
+                    ]
+                }).map(node=>({value:node.name})).node,
+                {
+                    value: 'root',
+                    children:[
+                        { value: 'child A'},
+                        { value: 'child B'}
+                    ]
+                }
+            );
+        });
+        it('Map complex node.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    name: 'root',
+                    children:[
+                        { name: 'child A' },
+                        {
+                            name: 'child B',
+                            children: [
+                                { name: 'grandson A' },
+                                { name: 'grandson B' },
+                            ]
+                        },
+                        { name: 'child C' }
+                    ]
+                }).map(node=>({value:node.name})).node,
+                {
+                    value: 'root',
+                    children:[
+                        { value: 'child A'},
+                        {
+                            value: 'child B',
+                            children:[
+                                { value: 'grandson A' },
+                                { value: 'grandson B' }
+                            ]
+                        },
+                        { value: 'child C'},
+                    ]
+                }
+            );
+        });
+        it('Map node with new children setter and getter.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    name: 'root',
+                    children:[
+                        { name: 'child A' },
+                        { name: 'child B' }
+                    ]
+                }).map(
+                    node=>({value:node.name}),
+                    {
+                        getChildren(node){ return node.chs; },
+                        setChildren(node, children){ node.chs = children; }
+                    }
+                ).node,
+                {
+                    value: 'root',
+                    chs: [
+                        { value: 'child A' },
+                        { value: 'child B' }
+                    ]
+                }
+            )
+        });
+    });
 });
