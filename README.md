@@ -7,15 +7,18 @@ This script works in modern browsers and in Node.JS.
 In a browser:
 ```html
 <script type="module">
-    import * as tree from './tree.mjs';
+    import Tree from './tree.mjs';
+    // Write code here.
 </script>
 ```
 (Required ES Modules support and 'tree.mjs' should be on the same directory.)
 
-## Features
-Available to traverse tree.
+## Usage
+- Traverse a tree structure.
+
+### Examples to simple use
 ```javascript
-import {walk} from 'tree';
+import Tree from './tree.mjs';
 const root = {
     name: 'root',
     children :[
@@ -31,7 +34,7 @@ const root = {
         { name: 'child C'}
     ]
 };
-walk(root, o=>console.log(o.name));
+new Tree(root).walk(o=>console.log(o.name));
     // => child A
     // => grandson A
     // => grandson B
@@ -40,19 +43,24 @@ walk(root, o=>console.log(o.name));
 ```
 (The callback is called on the all **leaf** node.)
 
-Traverse as an iterator:
-```javascript
-import {Tree} from 'tree';
-/* ... */
-for(let node of new Tree(root)) console.log(node.name);
-```
-
 Breath-First mode:
 ```javascript
-walk(root, { Walker: BreathFirstWalker, visit: o=>console.log(o.name) });
+new Tree(root).walk({ Walker: BreathFirstWalker, visit: o=>console.log(o.name) });
     // => child A
     // => child C
     // => grandson A
     // => grandson B
     // => grandson C
 ```
+
+Traverse as an iterator:
+```javascript
+for(let node of new Tree(root)) console.log(node.name);
+```
+
+### Detail documents
+Clone this repository and run command below.
+```cmd
+npm run jsdoc
+```
+Then you can see the detail documents at the '{This project}/jsdoc/index.html'.
