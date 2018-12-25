@@ -58,6 +58,8 @@ Traverse as an iterator:
 for(let node of new Tree(root)) console.log(node.name);
 ```
 
+You can see more examples on `{This Project}/examples` .
+
 ### Detail documents
 Clone this repository and run command below.
 ```cmd

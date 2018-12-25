@@ -7,7 +7,7 @@
   "scripts": {
     "test:unit": "mocha src/**/*.test.mjs --require @babel/register",
     "pretest:black-box": "npm run build",
-    "test:black-box": "mocha black-box-test/**/*.mjs --require @babel/register",
+    "test:black-box": "mocha examples/**/*.mjs --require @babel/register",
     "test": "npm-run-all -s test:unit test:black-box",
     "lint": "eslint src/**/*.mjs",
     "prebuild": "node --experimental-modules build_scripts/checkdir.node.mjs dist",
