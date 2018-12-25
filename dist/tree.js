@@ -307,6 +307,10 @@ class Tree{
         });
     }
 
+    getNode(target){
+
+    }
+
     /**
      * Create a new tree with the result of the specified callback.
      *

@@ -10,15 +10,15 @@
     "test:black-box": "mocha examples/**/*.mjs --require @babel/register",
     "test": "npm-run-all -s test:unit test:black-box",
     "lint": "eslint src/**/*.mjs",
-    "prebuild": "node --experimental-modules build_scripts/checkdir.node.mjs dist",
     "build": "rollup -c rollup.config.js",
-    "prejsdoc": "node --experimental-modules build_scripts/checkdir.node.mjs jsdoc",
-    "jsdoc": "jsdoc src -r -d jsdoc -c jsdoc.json"
+    "jsdoc": "jsdoc src -r -d jsdoc -c jsdoc.json",
+    "prepare": "npm-run-all -s build jsdoc",
+    "prepublishOnly": "npm-run-all -s test lint"
   },
-  "keywords": [],
-  "author": "R.Mizukami",
+  "keywords": ["tree", "traversal", "functional"],
+  "author": "mizu-mizu",
   "license": "MIT",
-  "repository": {},
+  "repository": "github:uiui611/tree",
   "devDependencies": {
     "@babel/core": "^7.2.0",
     "@babel/preset-env": "^7.2.0",
