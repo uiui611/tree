@@ -5,7 +5,7 @@ describe('Tree feature test.', ()=>{
     it('Can access the node as property.', ()=>{
         const root = { name: 'root' };
         assert.deepStrictEqual(
-            new Tree(root).node,
+            new Tree(root).root,
             root
         );
     })
