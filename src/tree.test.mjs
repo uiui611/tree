@@ -123,7 +123,7 @@ describe('Check Tree Container', ()=>{
     describe('Tree#reduce feature.', ()=>{
         it('Not convert a single node.', ()=>{
             assert.deepStrictEqual(
-                new Tree({ name: 'root' }).reduce((p,c)=>'hoge'),
+                new Tree({ name: 'root' }).reduce(()=>'hoge'),
                 { name: 'root' }
             );
         });
