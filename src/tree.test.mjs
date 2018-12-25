@@ -41,7 +41,7 @@ describe('Check Tree Container', ()=>{
             assert.deepStrictEqual(
                 new Tree({
                     name: 'root',
-                }).map(node=>({value:node.name})).node,
+                }).map(node=>({value:node.name})).root,
                 { value: 'root' }
             );
         });
@@ -53,7 +53,7 @@ describe('Check Tree Container', ()=>{
                         { name: 'child A' },
                         { name: 'child B' }
                     ]
-                }).map(node=>({value:node.name})).node,
+                }).map(node=>({value:node.name})).root,
                 {
                     value: 'root',
                     children:[
@@ -78,7 +78,7 @@ describe('Check Tree Container', ()=>{
                         },
                         { name: 'child C' }
                     ]
-                }).map(node=>({value:node.name})).node,
+                }).map(node=>({value:node.name})).root,
                 {
                     value: 'root',
                     children:[
@@ -109,7 +109,7 @@ describe('Check Tree Container', ()=>{
                         getChildren(node){ return node.chs; },
                         setChildren(node, children){ node.chs = children; }
                     }
-                ).node,
+                ).root,
                 {
                     value: 'root',
                     chs: [

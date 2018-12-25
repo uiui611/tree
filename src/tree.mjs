@@ -32,8 +32,35 @@ class Tree{
         getChildren=o=>o.children,
         setChildren=(node, children)=>node.children = children
     }={}){
-        this.node = root;
-        Object.assign(this, {getChildren, setChildren });
+        /**
+         * The root object of this tree.
+         * @member {*}
+         */
+        this.root = root;
+        Object.assign(this, {
+            /**
+             * The way to get children from a node.
+             *
+             * You can overwrite this method to change the way.
+             * It is recommended to overwrite with {@link Tree#setChildren setChildren()} .
+             *
+             * You can set this parameter on the constructor, too.
+             * @method Tree#getChildren
+             * @param {*} node The target node.
+             * @return {Array} The children of the target node.
+             */
+            getChildren,
+            /**
+             * The way to set children of the node.
+             *
+             * You can overwrite this method to change the way.
+             * It is recommended to overwrite with {@link Tree#getChildren getChildren()} .
+             * @method Tree#setChildren
+             * @param {*} node The node.
+             * @param {Array} children The children list to set.
+             */
+            setChildren
+        });
     }
 
     /**
@@ -104,10 +131,10 @@ class Tree{
      * @param {object|function} options The option object for the second argument of {@link walk walk(root, option)}.
      * @see walk
      */
-    walk(options){ return walk(this.node, options); }
+    walk(options){ return walk(this.root, options); }
 
     [Symbol.iterator](){
-        const walker = new DepthFirstWalker(this.node, {getChildren: this.getChildren });
+        const walker = new DepthFirstWalker(this.root, {getChildren: this.getChildren });
         return {
             next: ()=>{
                 let res;
