@@ -2,6 +2,8 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var arrayMatcher = require('@mizu-mizu/array-matcher');
+
 /**
  * @file Available to walk trees.
  * @author mizu-mizu
@@ -372,6 +374,26 @@ class Tree{
             }
         });
         return stack[0][0];
+    }
+
+    /**
+     * Get the first match to the query.
+     *
+     * The query matching is depends on the feature of '@mizu-mizu/array-matcher#querySelector' which supports
+     * - id selector (#id-name for {id:'id-name'})
+     * - class selector (.class-name for {classList:['class-name]}
+     * - space separator (matches any number of node)
+     * - '>' separator (matches whose children only)
+     * @param {string} query The query to find a node like css pattern.
+     * @return {object|null} first match to the query or null(not found).
+     */
+    getNode(query){
+        const matcher = arrayMatcher.querySelector(query);
+        const walker = new DepthFirstWalker(this.root, {getChildren: this.getChildren });
+        while(walker.next()!==traversalState.END_TRAVERSAL){
+            if(matcher([...walker.getParents(), walker.current])) return walker.current;
+        }
+        return null;
     }
 
     /**

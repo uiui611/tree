@@ -158,4 +158,37 @@ describe('Check Tree Container', ()=>{
             );
         });
     });
+    describe('Tree#getNode feature.', ()=>{
+        it('Get leaf node.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    value: 100,
+                    children:[
+                        {value: 1, id: 'search-for' },
+                        {value: 10}
+                    ]
+                }).getNode('#search-for'),
+                {value:1, id: 'search-for' }
+            );
+        })
+        it('Get not a leaf node.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    value: 100,
+                    children:[
+                        {
+                            value: 1,
+                            id: 'search-for',
+                            children:[{value: 10}]
+                        },
+                    ]
+                }).getNode('#search-for'),
+                {
+                    value:1,
+                    id: 'search-for',
+                    children:[{value:10}]
+                }
+            );
+        })
+    });
 });
