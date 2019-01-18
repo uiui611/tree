@@ -106,8 +106,8 @@ describe('Check Tree Container', ()=>{
                 }).map(
                     node=>({value:node.name}),
                     {
-                        getChildren(node){ return node.chs; },
-                        setChildren(node, children){ node.chs = children; }
+                        childrenGetter(node){ return node.chs; },
+                        childrenSetter(node, children){ node.chs = children; }
                     }
                 ).root,
                 {
