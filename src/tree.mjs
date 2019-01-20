@@ -98,6 +98,13 @@ class Tree{
         return new Tree(root, override);
     }
 
+    filter(filterFunction, option){
+        const override=tree_getOptions.call(this, option);
+        const root = this.reduce((children, current)=>{
+
+        });
+    }
+
     /**
      * Compute a single object from a node and an object from it's children.
      * @callback Tree~reducer

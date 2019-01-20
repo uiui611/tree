@@ -27,18 +27,17 @@ class ObjectTreeWalker{
     /**
      * Get the children of the node.
      *
-     * Returns falsy value if and only if the node is a leaf node.
-     * When the result is an empty array,
-     *     it means target node is not a leaf node but no children are found.
-     * @param {object} node Target node to get children.
-     * @returns {object[]} The children or falsy value.
+     * Returns falsy value or empty array if and only if the node is a leaf node.
+     * When the result is an empty array.
+     * @param {any} node Target node to get children.
+     * @returns {any[]|false} The children or falsy value.
      */
     getChildren(node){ return node.children; }
 
     /**
      * Move to the next node and return it.
      * @abstract
-     * @return {object|traversalState.END_TRAVERSAL} The next node value or
+     * @return {any|traversalState.END_TRAVERSAL} The next node value or
      *     {@link traversalState.END_TRAVERSAL} if the traversal have been completed.
      */
     next(){ throw new Error('Must be implemented by the subclass. ') }
@@ -59,18 +58,18 @@ class ObjectTreeWalker{
  * @readonly
  * @enum traversalState
  * @property PRE The current value has children, before visiting them.
- * @property LEAF The current value don't have a property 'children'.
+ * @property LEAF The current value don't have any children.
  * @property POST The current value has children, after visiting them.
  * @property END_TRAVERSAL The traversal have been finished.
  */
 export const traversalState = Object.freeze({
-    PRE: { toString:()=>'PRE'},
-    LEAF: { toString: ()=>'LEAF' },
-    POST: { toString: ()=>'POST' },
+    PRE: Symbol('PRE'),
+    LEAF: Symbol('LEAF'),
+    POST: Symbol('POST'),
     END_TRAVERSAL: null
 });
 function depthFirstWalker_enter(node){
-    const children = node.value && this.getChildren(node.value);
+    const children = node.value && getValidChildren(this.getChildren(node.value));
     Object.assign(privates.get(this), {
         currentNode: node,
         state: children ? traversalState.PRE : traversalState.LEAF
@@ -112,9 +111,9 @@ export class DepthFirstWalker extends ObjectTreeWalker{
                 return depthFirstWalker_enter.call(this, currentNode.next);
             }
             case traversalState.PRE: {
-                const children = this.getChildren(currentNode.value);
+                const children = getValidChildren(this.getChildren(currentNode.value));
                 // Recompute children (it's children can be changed).
-                if (!(children && children.length)) {
+                if (!children) {
                     privates.get(this).state = traversalState.POST;
                     return currentNode.value;
                 }
@@ -133,6 +132,9 @@ export class DepthFirstWalker extends ObjectTreeWalker{
                 return traversalState.END_TRAVERSAL;
         }
     }
+}
+function getValidChildren(children){
+    if(children && children.length) return children;
 }
 /**
  * A tree walker for breath-first traversal.
@@ -162,7 +164,7 @@ export class BreathFirstWalker extends ObjectTreeWalker{
         const {currentNode, lastNode} = privates.get(this);
         const children = currentNode.value
             && !currentNode.post
-            && this.getChildren(currentNode.value);
+            && getValidChildren(this.getChildren(currentNode.value));
         if(children){
             const lastChild =
                 children.map(value=>({
@@ -181,10 +183,11 @@ export class BreathFirstWalker extends ObjectTreeWalker{
             return privates.get(this).currentNode = traversalState.END_TRAVERSAL;
         }
         const next = currentNode.next;
+        const nextChildren = getValidChildren(this.getChildren(next.value));
         privates.get(this).state =
-            next.post ? traversalState.POST :
-            this.getChildren(currentNode.next.value) ? traversalState.PRE :
-            traversalState.LEAF;
+            next.post    ? traversalState.POST :
+            nextChildren ? traversalState.PRE  :
+                           traversalState.LEAF;
         return (privates.get(this).currentNode = currentNode.next).value;
     }
 }
@@ -192,15 +195,15 @@ export class BreathFirstWalker extends ObjectTreeWalker{
 /**
  * The callback for visit tree node.
  * @callback visitor
- * @param {object} node The current node.
+ * @param {any} node The current node.
  * @param {object} option The optional information container.
- * @param {Array.<object>} option.parents The array for the current node from the root.
+ * @param {Array.<any>} option.parents The array for the current node from the root.
  * @param {boolean} option.isOnLeaf True if and only if the walker is on a leaf node.
  */
 
 /**
  * Traversal for tree object.
- * @param {Object} root The root object to traversal.
+ * @param {any} root The root object to traversal.
  * @param {Object|function} option Option object or callback to visit.
  * @param {function} [option.Walker=DepthFirstWalker] The constructor to traversal tree implements {@link ObjectTreeWalker}.
  * @param {function} [option.getChildren=o=>o.children] The getter for tree-node's children.

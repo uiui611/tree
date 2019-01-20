@@ -33,11 +33,10 @@ class ObjectTreeWalker{
     /**
      * Get the children of the node.
      *
-     * Returns falsy value if and only if the node is a leaf node.
-     * When the result is an empty array,
-     *     it means target node is not a leaf node but no children are found.
+     * Returns falsy value or empty array if and only if the node is a leaf node.
+     * When the result is an empty array.
      * @param {object} node Target node to get children.
-     * @returns {object[]} The children or falsy value.
+     * @returns {any[]|false} The children or falsy value.
      */
     getChildren(node){ return node.children; }
 
@@ -65,18 +64,18 @@ class ObjectTreeWalker{
  * @readonly
  * @enum traversalState
  * @property PRE The current value has children, before visiting them.
- * @property LEAF The current value don't have a property 'children'.
+ * @property LEAF The current value don't have any children.
  * @property POST The current value has children, after visiting them.
  * @property END_TRAVERSAL The traversal have been finished.
  */
 const traversalState = Object.freeze({
-    PRE: { toString:()=>'PRE'},
-    LEAF: { toString: ()=>'LEAF' },
-    POST: { toString: ()=>'POST' },
+    PRE: Symbol('PRE'),
+    LEAF: Symbol('LEAF'),
+    POST: Symbol('POST'),
     END_TRAVERSAL: null
 });
 function depthFirstWalker_enter(node){
-    const children = node.value && this.getChildren(node.value);
+    const children = node.value && getValidChildren(this.getChildren(node.value));
     Object.assign(privates.get(this), {
         currentNode: node,
         state: children ? traversalState.PRE : traversalState.LEAF
@@ -118,9 +117,9 @@ class DepthFirstWalker extends ObjectTreeWalker{
                 return depthFirstWalker_enter.call(this, currentNode.next);
             }
             case traversalState.PRE: {
-                const children = this.getChildren(currentNode.value);
+                const children = getValidChildren(this.getChildren(currentNode.value));
                 // Recompute children (it's children can be changed).
-                if (!(children && children.length)) {
+                if (!children) {
                     privates.get(this).state = traversalState.POST;
                     return currentNode.value;
                 }
@@ -139,6 +138,9 @@ class DepthFirstWalker extends ObjectTreeWalker{
                 return traversalState.END_TRAVERSAL;
         }
     }
+}
+function getValidChildren(children){
+    if(children && children.length) return children;
 }
 /**
  * A tree walker for breath-first traversal.
@@ -168,7 +170,7 @@ class BreathFirstWalker extends ObjectTreeWalker{
         const {currentNode, lastNode} = privates.get(this);
         const children = currentNode.value
             && !currentNode.post
-            && this.getChildren(currentNode.value);
+            && getValidChildren(this.getChildren(currentNode.value));
         if(children){
             const lastChild =
                 children.map(value=>({
@@ -187,10 +189,11 @@ class BreathFirstWalker extends ObjectTreeWalker{
             return privates.get(this).currentNode = traversalState.END_TRAVERSAL;
         }
         const next = currentNode.next;
+        const nextChildren = getValidChildren(this.getChildren(next.value));
         privates.get(this).state =
-            next.post ? traversalState.POST :
-            this.getChildren(currentNode.next.value) ? traversalState.PRE :
-            traversalState.LEAF;
+            next.post    ? traversalState.POST :
+            nextChildren ? traversalState.PRE  :
+                           traversalState.LEAF;
         return (privates.get(this).currentNode = currentNode.next).value;
     }
 }
@@ -343,6 +346,13 @@ class Tree{
         return new Tree(root, override);
     }
 
+    filter(filterFunction, option){
+        const override=tree_getOptions.call(this, option);
+        const root = this.reduce((children, current)=>{
+
+        });
+    }
+
     /**
      * Compute a single object from a node and an object from it's children.
      * @callback Tree~reducer
@@ -391,7 +401,7 @@ class Tree{
      * - space separator (matches any number of node)
      * - '>' separator (matches whose children only)
      * @param {string} query The query to find a node like css pattern.
-     * @return {object|null} First match to the query or null(not found).
+     * @return {*|null} First match to the query or null(not found).
      */
     getNode(query){
         const matcher = arrayMatcher.querySelector(query);
@@ -414,7 +424,7 @@ class Tree{
     }
 
     /**
-     * Walk throw the current node.
+     * Walk through the current node.
      * @param {object|function} options The option object for the second argument of {@link walk walk(root, option)}.
      * @see walk
      */
