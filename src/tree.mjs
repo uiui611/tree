@@ -169,7 +169,7 @@ class Tree{
     }
 
     /**
-     * Walk throw the current node.
+     * Walk through the current node.
      * @param {object|function} options The option object for the second argument of {@link walk walk(root, option)}.
      * @see walk
      */
