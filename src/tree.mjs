@@ -146,7 +146,7 @@ class Tree{
      * - space separator (matches any number of node)
      * - '>' separator (matches whose children only)
      * @param {string} query The query to find a node like css pattern.
-     * @return {object|null} First match to the query or null(not found).
+     * @return {*|null} First match to the query or null(not found).
      */
     getNode(query){
         const matcher = querySelector(query);
