@@ -146,7 +146,7 @@ class Tree{
      * - space separator (matches any number of node)
      * - '>' separator (matches whose children only)
      * @param {string} query The query to find a node like css pattern.
-     * @return {object|null} first match to the query or null(not found).
+     * @return {object|null} First match to the query or null(not found).
      */
     getNode(query){
         const matcher = querySelector(query);
@@ -155,6 +155,17 @@ class Tree{
             if(matcher([...walker.getParents(), walker.current])) return walker.current;
         }
         return null;
+    }
+
+    /**
+     * Get the children node as an instance of the Tree.
+     * @param {string} query The query to find a node like css pattern.
+     * @return {Tree|null} First match to the query or null (not found).
+     */
+    getNodeAsTree(query){
+        const node = this.getNode(query);
+        if(node === null) return node;
+        return new Tree(node, tree_getOptions.call(this, {}));
     }
 
     /**

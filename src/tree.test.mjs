@@ -170,7 +170,7 @@ describe('Check Tree Container', ()=>{
                 }).getNode('#search-for'),
                 {value:1, id: 'search-for' }
             );
-        })
+        });
         it('Get not a leaf node.', ()=>{
             assert.deepStrictEqual(
                 new Tree({
@@ -190,5 +190,22 @@ describe('Check Tree Container', ()=>{
                 }
             );
         })
+    });
+    describe('Tree#getNodeAsTree feature.', ()=>{
+        it('Not found case.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({ value: 100 })
+                    .getNodeAsTree('#no-id'),
+                null
+            );
+        });
+        it('Simple case.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({ value: 100 , id: 'target-id'})
+                    .getNodeAsTree('#target-id')
+                    .root,
+                {value: 100, id: 'target-id' }
+            );
+        });
     });
 });

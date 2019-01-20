@@ -252,13 +252,21 @@ function walk(root, option){
  * @author mizu-mizu
  */
 
-function tree_getOptions({getChildren=null, setChildren=null}={}){
-    if((getChildren || setChildren) && !(getChildren && setChildren)){
-        throw new Error('You should specify getChildren and setChildren both or neither.');
+function extend(target, ...sources){
+    sources.forEach(s=>{
+        Object.entries(s).forEach(([k, v])=>{
+            if(typeof v !== "undefined") target[k] = v;
+        });
+    });
+}
+
+function tree_getOptions({childrenGetter=null, childrenSetter=null}={}){
+    if((childrenGetter || childrenSetter) && !(childrenGetter && childrenSetter)){
+        throw new Error('You should specify childrenGetter and childrenSetter both or neither.');
     }
     return {
-        newGetChildren: getChildren || this.getChildren,
-        newSetChildren: setChildren || this.setChildren
+        childrenGetter: childrenGetter || this.childrenGetter,
+        childrenSetter: childrenSetter || this.childrenSetter
     };
 }
 /**
@@ -266,75 +274,73 @@ function tree_getOptions({getChildren=null, setChildren=null}={}){
  * @class Tree
  * @param {object} root The root node for tree object.
  * @param {object} [option={}] The option object.
- * @param {function} [option.getChildren=o=>o.children]
- *   The function to get node's children.<br>
- *   This function returns an array of children or a falsy value (if it is a leaf node).
- * @param {function} [option.setChildren=(node, children)=>node.children=children]
- *   The function to set node's children.<br>
- *   This function is used to create new tree by default.
+ * @param {function} [option.childrenGetter]
+ *   Override {@link Tree#childrenGetter this#childrenGetter}.
+ * @param {function} [option.childrenSetter]
+ *   Override {@link Tree#childrenSetter this#childrenSetter}.
+ * @see Tree#childrenGetter
+ * @see Tree#childrenSetter
  */
 class Tree{
     constructor(root, {
-        getChildren=o=>o.children,
-        setChildren=(node, children)=>node.children = children
+        childrenGetter=undefined,
+        childrenSetter=undefined
     }={}){
         /**
          * The root object of this tree.
          * @member {*}
          */
         this.root = root;
-        Object.assign(this, {
-            /**
-             * The way to get children from a node.
-             *
-             * You can overwrite this method to change the way.
-             * It is recommended to overwrite with {@link Tree#setChildren setChildren()} .
-             *
-             * You can set this parameter on the constructor, too.
-             * @method Tree#getChildren
-             * @param {*} node The target node.
-             * @return {Array} The children of the target node.
-             */
-            getChildren,
-            /**
-             * The way to set children of the node.
-             *
-             * You can overwrite this method to change the way.
-             * It is recommended to overwrite with {@link Tree#getChildren getChildren()} .
-             * @method Tree#setChildren
-             * @param {*} node The node.
-             * @param {Array} children The children list to set.
-             */
-            setChildren
+        extend(this, {
+            childrenGetter,
+            childrenSetter
         });
     }
-
-    getNode(target){
-
-    }
+    /**
+     * The way to get children from a node.
+     *
+     * You can overwrite this method to change the way.
+     * It is recommended to overwrite with {@link Tree#childrenSetter childrenSetter()} .
+     *
+     * You can set this parameter on the constructor, too.
+     * @method Tree#childrenGetter
+     * @param {*} node The target node.
+     * @return {Array|null} The children of the target node or null if this is a leaf node.
+     */
+    childrenGetter(node){ return node.children; }
+    /**
+     * The way to set children of the node.
+     *
+     * You can overwrite this method to change the way.
+     * It is recommended to overwrite with {@link Tree#childrenGetter childrenGetter()} .
+     * @method Tree#childrenSetter
+     * @param {*} node The node.
+     * @param {Array} children The node list to set as children.
+     */
+    childrenSetter(node, children){ node.children = children; }
 
     /**
      * Create a new tree with the result of the specified callback.
      *
      * This method keep the structure of this tree, and map values of each node.
      * @param {function} mappingFunction Callback to create new node.
-     * @param {object} [options={}] The option of this method.
-     * @param {function} [options.getChildren=this.getChildren] The way to get children on the new tree.
-     * @param {function} [options.setChildren=this.setChildren] The way to set children for the new tree.<br>
-     *   If you set this option, then you should set `option.getChildren` too.
+     * @param {object} [option={}] The option of this method.
+     * @param {function} [option.childrenGetter=this.childrenGetter] The way to get children on the new tree.
+     * @param {function} [option.childrenSetter=this.childrenSetter] The way to set children for the new tree.<br>
+     *   If you set this option, then you should set `option.childrenGetter` too.
      * @returns {Tree} The generated tree.
      */
-    map(mappingFunction, options){
-        const {newSetChildren, newGetChildren}=tree_getOptions.call(this, options);
+    map(mappingFunction, option){
+        const override=tree_getOptions.call(this, option);
         const root = this.reduce(
             (children, node, {isOnLeaf})=>{
                 const newNode = mappingFunction(node);
-                if(!isOnLeaf) newSetChildren(newNode, children);
+                if(!isOnLeaf) override.childrenSetter(newNode, children);
                 return newNode;
             },
             null
         );
-        return new Tree(root, {getChildren: newGetChildren, setChildren: newSetChildren });
+        return new Tree(root, override);
     }
 
     /**
@@ -349,7 +355,7 @@ class Tree{
      * Compute a single value from this tree.
      *
      * The reducer apply children array, and the current node.
-     * If you set the initial value, then the reducer is called on the laef node too,
+     * If you set the initial value, then the reducer is called on the leaf node too,
      *   but you have not, then it is called on the non-leaf node only.
      * @param {Tree~reducer} reducer The reducer to combine node and it's children.
      * @param {*} [initial] The initial value to provide leaf node's children.
@@ -385,15 +391,26 @@ class Tree{
      * - space separator (matches any number of node)
      * - '>' separator (matches whose children only)
      * @param {string} query The query to find a node like css pattern.
-     * @return {object|null} first match to the query or null(not found).
+     * @return {object|null} First match to the query or null(not found).
      */
     getNode(query){
         const matcher = arrayMatcher.querySelector(query);
-        const walker = new DepthFirstWalker(this.root, {getChildren: this.getChildren });
+        const walker = new DepthFirstWalker(this.root, {childrenGetter: this.childrenGetter });
         while(walker.next()!==traversalState.END_TRAVERSAL){
             if(matcher([...walker.getParents(), walker.current])) return walker.current;
         }
         return null;
+    }
+
+    /**
+     * Get the children node as an instance of the Tree.
+     * @param {string} query The query to find a node like css pattern.
+     * @return {Tree|null} First match to the query or null (not found).
+     */
+    getNodeAsTree(query){
+        const node = this.getNode(query);
+        if(node === null) return node;
+        return new Tree(node, tree_getOptions.call(this, {}));
     }
 
     /**
@@ -404,7 +421,7 @@ class Tree{
     walk(options){ return walk(this.root, options); }
 
     [Symbol.iterator](){
-        const walker = new DepthFirstWalker(this.root, {getChildren: this.getChildren });
+        const walker = new DepthFirstWalker(this.root, {getChildren: this.childrenGetter });
         return {
             next: ()=>{
                 let res;
