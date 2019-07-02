@@ -31,7 +31,7 @@ class ObjectTreeWalker{
      *
      * Returns falsy value or empty array if and only if the node is a leaf node.
      * When the result is an empty array.
-     * @param {object} node Target node to get children.
+     * @param {any} node Target node to get children.
      * @returns {any[]|false} The children or falsy value.
      */
     getChildren(node){ return node.children; }
@@ -39,7 +39,7 @@ class ObjectTreeWalker{
     /**
      * Move to the next node and return it.
      * @abstract
-     * @return {object|traversalState.END_TRAVERSAL} The next node value or
+     * @return {any|traversalState.END_TRAVERSAL} The next node value or
      *     {@link traversalState.END_TRAVERSAL} if the traversal have been completed.
      */
     next(){ throw new Error('Must be implemented by the subclass. ') }
@@ -197,15 +197,15 @@ class BreathFirstWalker extends ObjectTreeWalker{
 /**
  * The callback for visit tree node.
  * @callback visitor
- * @param {object} node The current node.
+ * @param {any} node The current node.
  * @param {object} option The optional information container.
- * @param {Array.<object>} option.parents The array for the current node from the root.
+ * @param {Array.<any>} option.parents The array for the current node from the root.
  * @param {boolean} option.isOnLeaf True if and only if the walker is on a leaf node.
  */
 
 /**
  * Traversal for tree object.
- * @param {Object} root The root object to traversal.
+ * @param {any} root The root object to traversal.
  * @param {Object|function} option Option object or callback to visit.
  * @param {function} [option.Walker=DepthFirstWalker] The constructor to traversal tree implements {@link ObjectTreeWalker}.
  * @param {function} [option.getChildren=o=>o.children] The getter for tree-node's children.
@@ -342,11 +342,20 @@ class Tree{
         return new Tree(root, override);
     }
 
-    filter(filterFunction, option){
-        const override=tree_getOptions.call(this, option);
+    /**
+     * Create new tree
+     * @param filterFunction
+     * @return {Tree}
+     */
+    filter(filterFunction){
+        const override=tree_getOptions.call(this, {});
         const root = this.reduce((children, current)=>{
-
+            const newChildren = children.filter(filterFunction);
+            override.childrenSetter(current, newChildren);
+            return current;
         });
+        if(!filterFunction(root)) return new Tree(null);
+        return new Tree(root, override);
     }
 
     /**

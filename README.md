@@ -14,7 +14,9 @@ In a browser:
 (Required ES Modules support and 'tree.mjs' should be on the same directory.)
 
 ## Usage
-- Traverse a tree structure.
+- Tree traversal
+- Map tree
+- Reduce tree
 
 ### Examples to simple use
 ```javascript

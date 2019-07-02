@@ -208,4 +208,38 @@ describe('Check Tree Container', ()=>{
             );
         });
     });
+    describe('Tree#filter feature.', ()=>{
+        it('Simple use.', ()=>{
+            assert.deepStrictEqual(
+                new Tree({
+                    value: 101,
+                    children:[
+                        { value: 10},
+                        { value: 11}
+                    ]
+                })
+                .filter(node=>node.value%10===1)
+                .root,
+                {
+                    value: 101,
+                    children:[
+                        { value:11 }
+                    ]
+                }
+            );
+        });
+        it('Remove on parent.', ()=>{
+            assert.ok(!
+                new Tree({
+                    value: 100,
+                    children:[
+                        { value: 10},
+                        { value: 11}
+                    ]
+                })
+                .filter(node=>node.value%10===1)
+                .root
+            );
+        });
+    });
 });

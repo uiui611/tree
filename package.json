@@ -15,22 +15,26 @@
     "prepare": "npm-run-all -s build jsdoc",
     "prepublishOnly": "npm-run-all -s test lint"
   },
-  "keywords": ["tree", "traversal", "functional"],
+  "keywords": [
+    "tree",
+    "traversal",
+    "functional"
+  ],
   "author": "mizu-mizu",
   "license": "MIT",
   "repository": "github:uiui611/tree",
   "devDependencies": {
-    "@babel/core": "^7.2.0",
-    "@babel/preset-env": "^7.2.0",
-    "@babel/register": "^7.0.0",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.10.0",
-    "jsdoc": "^3.5.5",
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "babel-eslint": "^10.0.2",
+    "eslint": "^5.16.0",
+    "jsdoc": "^3.6.2",
     "mocha": "^5.2.0",
     "npm-run-all": "^4.1.5",
     "rollup": "^0.67.4"
   },
   "dependencies": {
-    "@mizu-mizu/array-matcher": "^1.1.1"
+    "@mizu-mizu/array-matcher": "^1.1.2"
   }
 }

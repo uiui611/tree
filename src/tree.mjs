@@ -98,11 +98,20 @@ class Tree{
         return new Tree(root, override);
     }
 
-    filter(filterFunction, option){
-        const override=tree_getOptions.call(this, option);
+    /**
+     * Create new tree
+     * @param filterFunction
+     * @return {Tree}
+     */
+    filter(filterFunction){
+        const override=tree_getOptions.call(this, {});
         const root = this.reduce((children, current)=>{
-
+            const newChildren = children.filter(filterFunction);
+            override.childrenSetter(current, newChildren);
+            return current;
         });
+        if(!filterFunction(root)) return new Tree(null);
+        return new Tree(root, override);
     }
 
     /**
