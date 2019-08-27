@@ -1,33 +1,40 @@
 {
   "name": "@mizu-mizu/tree",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Utilities about tree structure.",
   "main": "dist/tree.js",
   "scripts": {
     "test:unit": "mocha src/**/*.test.mjs --require @babel/register",
     "pretest:black-box": "npm run build",
-    "test:black-box": "mocha black-box-test/**/*.mjs --require @babel/register",
+    "test:black-box": "mocha examples/**/*.mjs --require @babel/register",
     "test": "npm-run-all -s test:unit test:black-box",
     "lint": "eslint src/**/*.mjs",
-    "prebuild": "node --experimental-modules build_scripts/checkdir.node.mjs dist",
     "build": "rollup -c rollup.config.js",
-    "prejsdoc": "node --experimental-modules build_scripts/checkdir.node.mjs jsdoc",
-    "jsdoc": "jsdoc src -r -d jsdoc -c jsdoc.json"
+    "jsdoc": "jsdoc src -r -d jsdoc -c jsdoc.json",
+    "prepare": "npm-run-all -s build jsdoc",
+    "prepublishOnly": "npm-run-all -s test lint"
   },
-  "keywords": [],
-  "author": "R.Mizukami",
+  "keywords": [
+    "tree",
+    "traversal",
+    "functional"
+  ],
+  "author": "mizu-mizu",
   "license": "MIT",
-  "repository": {},
+  "repository": "github:uiui611/tree",
   "devDependencies": {
-    "@babel/core": "^7.2.0",
-    "@babel/preset-env": "^7.2.0",
-    "@babel/register": "^7.0.0",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.10.0",
-    "jsdoc": "^3.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/register": "^7.5.5",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^5.16.0",
+    "jsdoc": "^3.6.3",
     "mocha": "^5.2.0",
     "npm-run-all": "^4.1.5",
     "rollup": "^0.67.4"
+  },
+  "dependencies": {
+    "@mizu-mizu/array-matcher": "^1.1.2"
   }
 }

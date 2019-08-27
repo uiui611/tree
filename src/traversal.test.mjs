@@ -60,31 +60,6 @@ describe('Walk with DepthFirstWalker.', ()=>{
             }
         );
     });
-    it('On a parent with no children.', ()=>{
-        const root = { name: 'hoge', children: [] };
-        const inst = new DepthFirstWalker(root);
-        inst.next();
-        assert.deepStrictEqual(
-            partial(['state', 'current'], inst),
-            {
-                state: traversalState.PRE,
-                current: root
-            }
-        );
-    });
-    it('On a parent with no children (at POST traversalState).', ()=>{
-        const root = { name: 'hoge', children: [] };
-        const inst = new DepthFirstWalker(root);
-        inst.next();
-        inst.next();
-        assert.deepStrictEqual(
-            partial(['state', 'current'], inst),
-            {
-                state: traversalState.POST,
-                current: root
-            }
-        );
-    });
     it('End traversal for a single node.', ()=>{
         const inst = new DepthFirstWalker({ name: 'hoge' });
         inst.next();
@@ -232,5 +207,30 @@ describe('Walk with BreathFirstWalker.',()=>{
                 ]
             );
         });
+        it('Visit as a leaf node who has empty children.', ()=>{
+            const founds = [];
+            walk(
+                {
+                    name: 'root',
+                    children:[
+                        { name: 'child', children:[] }
+                    ]
+                },
+                {
+                    Walker,
+                    preVisit(o){ founds.push({val:o.name, type: traversalState.PRE }) },
+                    visit(o){ founds.push({val:o.name, type: traversalState.LEAF })},
+                    postVisit(o){ founds.push({val:o.name, type: traversalState.POST })}
+                }
+            );
+            assert.deepStrictEqual(
+                founds,
+                [
+                    { val:'root', type: traversalState.PRE },
+                    { val:'child', type: traversalState.LEAF },
+                    { val:'root', type: traversalState.POST },
+                ]
+            );
+        })
     });
 });
