@@ -1,7 +1,7 @@
 {
   "name": "@mizu-mizu/tree",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Utilities about tree structure.",
   "main": "dist/tree.js",
   "scripts": {
